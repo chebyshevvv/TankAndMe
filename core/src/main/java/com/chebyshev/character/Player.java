@@ -16,7 +16,7 @@ import com.chebyshev.map.Map;
 import static com.chebyshev.map.Map.TILE_SIZE;
 
 public class Player extends Actor implements Disposable {
-    public static final int TANK_SIZE = 150;
+    public static final int TANK_SIZE = 8;
     public final float TANK_SPEED = 90f;
     private final Map map;
 
@@ -42,7 +42,8 @@ public class Player extends Actor implements Disposable {
         tankUpRight = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_up_right.png")));
         tankRight = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_right.png")));
         tankDownRight = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_down_right.png")));
-        tankDown = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_down.png")));
+        //tankDown = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_down.png")));
+        tankDown = new TextureRegion(new Texture(Gdx.files.internal("map/river1.png")));
         tankDownLeft = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_down_left.png")));
         tankLeft = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_left.png")));
         tankUpLeft = new TextureRegion(new Texture(Gdx.files.internal("tank/tank_up_left.png")));
@@ -71,36 +72,44 @@ public class Player extends Actor implements Disposable {
 
         // 8方向判断+纹理切换+移动矢量赋值
         if (up && !down && !left && !right) {
-            currentTank = tankUp;
+            //currentTank = tankUp;
             moveY = TANK_SPEED * delta;
         } else if (up && right) {
-            currentTank = tankUpRight;
+            //currentTank = tankUpRight;
             moveX = TANK_SPEED * delta * 0.7f;
             moveY = TANK_SPEED * delta * 0.7f;
         } else if (right && !down) {
-            currentTank = tankRight;
+            //currentTank = tankRight;
             moveX = TANK_SPEED * delta;
         } else if (down && right) {
-            currentTank = tankDownRight;
+            //currentTank = tankDownRight;
             moveX = TANK_SPEED * delta * 0.7f;
             moveY = -TANK_SPEED * delta * 0.7f;
         } else if (down && !up && !left) {
-            currentTank = tankDown;
+            //currentTank = tankDown;
             moveY = -TANK_SPEED * delta;
         } else if (down && left) {
-            currentTank = tankDownLeft;
+            //currentTank = tankDownLeft;
             moveX = -TANK_SPEED * delta * 0.7f;
             moveY = -TANK_SPEED * delta * 0.7f;
         } else if (left && !up) {
-            currentTank = tankLeft;
+            //currentTank = tankLeft;
             moveX = -TANK_SPEED * delta;
         } else if (up && left) {
-            currentTank = tankUpLeft;
+            //currentTank = tankUpLeft;
             moveX = -TANK_SPEED * delta * 0.7f;
             moveY = TANK_SPEED * delta * 0.7f;
         }
-        setX(getX() + moveX);
-        setY(getY() + moveY);
+        float targetX = getX() + moveX;
+        float targetY = getY() + moveY;
+        if (isBlocked(targetX, getY())) {
+            targetX = getX();
+        }
+        if (isBlocked(getX(), targetY)) {
+            targetY = getY();
+        }
+        setX(targetX);
+        setY(targetY);
     }
 
     @Override
@@ -127,10 +136,10 @@ public class Player extends Actor implements Disposable {
         float tankTop = targetY + this.getHeight();
 
         // 转瓦片坐标
-        int startTileX = MathUtils.ceil(targetX / TILE_SIZE);
-        int startTileY = MathUtils.ceil(targetY / TILE_SIZE);
-        int endTileX = MathUtils.ceil(tankRight / TILE_SIZE);
-        int endTileY = MathUtils.ceil(tankTop / TILE_SIZE);
+        int startTileX = (int) (targetX / TILE_SIZE);
+        int startTileY = (int) (targetY / TILE_SIZE);
+        int endTileX = (int) (tankRight / TILE_SIZE);
+        int endTileY = (int) (tankTop / TILE_SIZE);
 
         for (int x = startTileX; x <= endTileX; x++) {
             for (int y = startTileY; y <= endTileY; y++) {
